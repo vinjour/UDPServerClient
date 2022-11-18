@@ -1,11 +1,10 @@
 import java.io.*;
 import java.net.*;
+import java.util.Arrays;
 
 public class UDPServer {
     public static void main(String args[]) throws Exception
     {
-        String var="bye";
-        var=var.intern();
         try
         {
             DatagramSocket serverSocket = new DatagramSocket(8080);
@@ -13,7 +12,7 @@ public class UDPServer {
             byte[] receiveData = new byte[1024];
             byte[] sendData1  = new byte[1024];
             byte[] sendData2  = new byte[1024];
-            while(true) //while(true) permet au serveur de rester en ecoute
+            while(true)     // permet au serveur de rester en écoute
             {
 
                 receiveData = new byte[1024];
@@ -25,46 +24,29 @@ public class UDPServer {
 
                 serverSocket.receive(receivePacket);
 
-                String sentence = new String(receivePacket.getData());
-                sentence=sentence.intern();
-
+                receivePacket.getData();
+                int l = receivePacket.getLength();
+                byte[] cutData = Arrays.copyOf(receiveData, l);
+                String sentence = new String(cutData);
 
                 InetAddress IPAddress = receivePacket.getAddress();
 
                 int port = receivePacket.getPort();
 
                 System.out.println ("From: " + IPAddress + ":" + port);
-                System.out.println ("Message: " + sentence+var);
-                if(sentence==var)
-                {String capitalizedSentence = sentence.toUpperCase();
+                System.out.println ("Message: " + sentence);
 
-                    sendData1 = capitalizedSentence.getBytes();
+                sendData1 = sentence.getBytes();
 
-                    DatagramPacket sendPacket1 = new DatagramPacket(sendData1, sendData2.length, IPAddress, port);
-
-                    serverSocket.send(sendPacket1);
-                    //serverSocket.close();
-                }
-
-                else if(sentence!=var)
-                {String phrase="donnez le mot bye";
-
-                    sendData2 = phrase.getBytes();
-
-                    DatagramPacket sendPacket2 = new DatagramPacket(sendData2, sendData2.length, IPAddress, port);
-
-                    serverSocket.send(sendPacket2);
-                    serverSocket.close();
-                }
-
+                DatagramPacket sendPacket1 = new DatagramPacket(sendData1, l, IPAddress, port);
+                serverSocket.send(sendPacket1);
+                //serverSocket.close();
             }
-
         }
         catch (SocketException ex) {
             System.out.println("UDP Port 8080 is occupied.");
             System.exit(1);
         }
-
     }
 //serverSocket.close();
 }
