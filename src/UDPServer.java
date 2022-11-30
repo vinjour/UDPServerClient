@@ -14,7 +14,6 @@ public class UDPServer {
     byte[] receiveData;
     byte[] sendData;
 
-
     public UDPServer() {
         try {
             serverSocket = new DatagramSocket(DEFAULT_PORT);
@@ -39,13 +38,11 @@ public class UDPServer {
     }
 
     private String receiveMessage() throws IOException {
+
         System.out.println("Waiting for datagram packet");
 
         serverSocket.receive(receivePacket);
-
-        // receivePacket.getData();
         int packetLength = receivePacket.getLength();
-        // byte[] cutData = Arrays.copyOf(receiveData, packetLength);
         String sentence = new String(receiveData, 0, packetLength, StandardCharsets.UTF_8);
         return sentence;
     }
