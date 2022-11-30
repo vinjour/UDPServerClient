@@ -8,17 +8,17 @@ import java.nio.charset.StandardCharsets;
 public class UDPServer {
 
     static int BUFFER_SIZE = 1024;
-    static int DEFAULT_PORT = 8080;
+    static int serverPort;
     DatagramSocket serverSocket;
     DatagramPacket receivePacket;
     byte[] receiveData;
     byte[] sendData;
 
-    public UDPServer() {
+    public UDPServer(int serverPort) {
         try {
-            serverSocket = new DatagramSocket(DEFAULT_PORT);
+            serverSocket = new DatagramSocket(serverPort);
         } catch (SocketException ex) {
-            System.out.println("UDP Port " + DEFAULT_PORT + " is occupied");
+            System.out.println("UDP Port " + serverPort + " is occupied");
             System.exit(1);
         }
 
@@ -62,7 +62,8 @@ public class UDPServer {
 
     public static void main(String[] args) throws Exception {
 
-        UDPServer udpServer = new UDPServer();
+        serverPort = Integer.parseInt(args[0]);
+        UDPServer udpServer = new UDPServer(serverPort);
         udpServer.launch();
     }
 }
