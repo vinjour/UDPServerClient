@@ -1,52 +1,71 @@
-import java.io.*;
-import java.net.*;
-import java.util.Arrays;
+import java.io.IOException;
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
+import java.net.InetAddress;
+import java.net.SocketException;
+import java.nio.charset.StandardCharsets;
 
 public class UDPServer {
-    public static void main(String args[]) throws Exception
-    {
-        try
-        {
-            DatagramSocket serverSocket = new DatagramSocket(8080);
 
-            byte[] receiveData = new byte[1024];
-            byte[] sendData1  = new byte[1024];
-            byte[] sendData2  = new byte[1024];
-            while(true)     // permet au serveur de rester en écoute
-            {
+    static int BUFFER_SIZE = 1024;
+    static int DEFAULT_PORT = 8080;
+    DatagramSocket serverSocket;
+    DatagramPacket receivePacket;
+    byte[] receiveData;
+    byte[] sendData;
 
-                receiveData = new byte[1024];
 
-                DatagramPacket receivePacket =
-                        new DatagramPacket(receiveData, receiveData.length);
-
-                System.out.println ("Waiting for datagram packet");
-
-                serverSocket.receive(receivePacket);
-
-                receivePacket.getData();
-                int l = receivePacket.getLength();
-                byte[] cutData = Arrays.copyOf(receiveData, l);
-                String sentence = new String(cutData);
-
-                InetAddress IPAddress = receivePacket.getAddress();
-
-                int port = receivePacket.getPort();
-
-                System.out.println ("From: " + IPAddress + ":" + port);
-                System.out.println ("Message: " + sentence);
-
-                sendData1 = sentence.getBytes();
-
-                DatagramPacket sendPacket1 = new DatagramPacket(sendData1, l, IPAddress, port);
-                serverSocket.send(sendPacket1);
-                //serverSocket.close();
-            }
-        }
-        catch (SocketException ex) {
-            System.out.println("UDP Port 8080 is occupied.");
+    public UDPServer() {
+        try {
+            serverSocket = new DatagramSocket(DEFAULT_PORT);
+        } catch (SocketException ex) {
+            System.out.println("UDP Port " + DEFAULT_PORT + " is occupied");
             System.exit(1);
         }
+
+        receiveData = new byte[BUFFER_SIZE];
+        receivePacket = new DatagramPacket(receiveData, receiveData.length);
     }
-//serverSocket.close();
+
+    public void launch() throws IOException {
+        boolean keepListening = true;
+
+        while (keepListening) {
+
+            String sentence = receiveMessage();
+            sendMessage(sentence);
+        }
+        serverSocket.close();
+    }
+
+    private String receiveMessage() throws IOException {
+        System.out.println("Waiting for datagram packet");
+
+        serverSocket.receive(receivePacket);
+
+        // receivePacket.getData();
+        int packetLength = receivePacket.getLength();
+        // byte[] cutData = Arrays.copyOf(receiveData, packetLength);
+        String sentence = new String(receiveData, 0, packetLength, StandardCharsets.UTF_8);
+        return sentence;
+    }
+
+    private void sendMessage(String sentence) throws IOException {
+        InetAddress clientAddress = receivePacket.getAddress();
+        int clientPort = receivePacket.getPort();
+
+        System.out.println("From: " + clientAddress + ":" + clientPort);
+        System.out.println("Message: " + sentence);
+
+        sendData = sentence.getBytes();
+
+        DatagramPacket sendPacket = new DatagramPacket(sendData, sentence.length(), clientAddress, clientPort);
+        serverSocket.send(sendPacket);
+    }
+
+    public static void main(String[] args) throws Exception {
+
+        UDPServer udpServer = new UDPServer();
+        udpServer.launch();
+    }
 }
