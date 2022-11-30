@@ -52,7 +52,7 @@ public class UDPServer {
         int clientPort = receivePacket.getPort();
 
         System.out.println("From: " + clientAddress + ":" + clientPort);
-        System.out.println("Message: " + sentence);
+        System.out.println("Message: " + sentence + "\n" );
 
         sendData = sentence.getBytes();
 
