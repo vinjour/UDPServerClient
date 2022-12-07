@@ -3,6 +3,7 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.SocketException;
+import java.nio.charset.StandardCharsets;
 
 public class UDPServer {
 
@@ -52,8 +53,7 @@ public class UDPServer {
         InetAddress clientAddress = receivePacket.getAddress();
         int clientPort = receivePacket.getPort();
 
-        sendData = sentence.getBytes();
-        DatagramPacket sendPacket = new DatagramPacket(sendData, sentence.length(), clientAddress, clientPort);
+        DatagramPacket sendPacket = new DatagramPacket(sentence.getBytes(StandardCharsets.UTF_8), sentence.length(), clientAddress, clientPort);
         serverSocket.send(sendPacket);
     }
 
