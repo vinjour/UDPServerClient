@@ -1,7 +1,6 @@
 import java.io.*;
 import java.net.*;
-import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
+
 
 public class UDPClient {
     static int BUFFER_SIZE = 1024;
@@ -10,10 +9,11 @@ public class UDPClient {
     DatagramSocket clientSocket;
     DatagramPacket receivePacket;
     BufferedReader inFromUser;
+    DataProcessing data;
     byte[] sendData;
     byte[] receiveData;
 
-    public UDPClient() throws IOException {
+    public UDPClient(DataProcessing datap) {
         try {
             clientSocket = new DatagramSocket();
         } catch (SocketException ex) {
@@ -21,11 +21,12 @@ public class UDPClient {
             System.exit(1);
         }
 
-        //On récupere la ligne courante
+        //On récupère la ligne courante
         inFromUser = new BufferedReader(new InputStreamReader(System.in));
         sendData = new byte[BUFFER_SIZE];
         receiveData = new byte[BUFFER_SIZE];
         receivePacket =  new DatagramPacket(receiveData, receiveData.length);
+        data = datap;
     }
 
     public void run(InetAddress serverAddress) throws IOException {
@@ -36,10 +37,11 @@ public class UDPClient {
 
             sendMessage(serverAddress);
 
-            // delai maximal d'attente 10000 ms
-            //clientSocket.setSoTimeout(10000);
+            // délai maximal d'attente 10000 ms
+            clientSocket.setSoTimeout(10000);
 
             receiveMessage(serverAddress, receivePacket);
+            data.process(receivePacket);
         }
         clientSocket.close();
     }
@@ -59,20 +61,17 @@ public class UDPClient {
         System.out.println ("Waiting for return packet");
 
         clientSocket.receive(receivePacket);
-        int packetLength = receivePacket.getLength();
-        System.out.print(packetLength);
-        String echoSentence = new String(receiveData, 0, packetLength, StandardCharsets.UTF_8);
 
         System.out.println("From server at: " + serverAddress + ":" + serverPort);
-        System.out.println("Message: " + echoSentence + "\n");
     }
 
     public static void main(String args[]) throws Exception {
 
+        DataProcessing data = new DataProcessing();
         serverAddress = InetAddress.getByName(args[0]);
         UDPClient.serverPort = Integer.parseInt(args[1]);
 
-        UDPClient udpClient = new UDPClient();
+        UDPClient udpClient = new UDPClient(data);
         udpClient.run(serverAddress);
     }
 }

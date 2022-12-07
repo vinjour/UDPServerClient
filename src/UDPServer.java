@@ -3,7 +3,6 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.SocketException;
-import java.nio.charset.StandardCharsets;
 
 public class UDPServer {
 
@@ -11,10 +10,11 @@ public class UDPServer {
     static int serverPort;
     DatagramSocket serverSocket;
     DatagramPacket receivePacket;
+    DataProcessing data;
     byte[] receiveData;
     byte[] sendData;
 
-    public UDPServer(int serverPort) {
+    public UDPServer(int serverPort, DataProcessing datap) {
         try {
             serverSocket = new DatagramSocket(serverPort);
         } catch (SocketException ex) {
@@ -24,6 +24,7 @@ public class UDPServer {
 
         receiveData = new byte[BUFFER_SIZE];
         receivePacket = new DatagramPacket(receiveData, receiveData.length);
+        data = datap;
     }
 
     public void launch() throws IOException {
@@ -31,39 +32,37 @@ public class UDPServer {
 
         while (keepListening) {
 
-            String sentence = receiveMessage();
+            receiveMessage();
+            String sentence = data.process(receivePacket);
             sendMessage(sentence);
         }
         serverSocket.close();
     }
 
-    private String receiveMessage() throws IOException {
+    private DatagramPacket receiveMessage() throws IOException {
 
         System.out.println("Waiting for datagram packet");
 
         serverSocket.receive(receivePacket);
-        int packetLength = receivePacket.getLength();
-        String sentence = new String(receiveData, 0, packetLength, StandardCharsets.UTF_8);
-        return sentence;
+        return receivePacket;
     }
+
 
     private void sendMessage(String sentence) throws IOException {
         InetAddress clientAddress = receivePacket.getAddress();
         int clientPort = receivePacket.getPort();
 
-        System.out.println("From: " + clientAddress + ":" + clientPort);
-        System.out.println("Message: " + sentence + "\n" );
-
         sendData = sentence.getBytes();
-
         DatagramPacket sendPacket = new DatagramPacket(sendData, sentence.length(), clientAddress, clientPort);
         serverSocket.send(sendPacket);
     }
 
     public static void main(String[] args) throws Exception {
 
+        DataProcessing data = new DataProcessing();
         serverPort = Integer.parseInt(args[0]);
-        UDPServer udpServer = new UDPServer(serverPort);
+        UDPServer udpServer = new UDPServer(serverPort, data);
         udpServer.launch();
     }
 }
+
