@@ -58,6 +58,11 @@ public class UDPServer {
 
     public static void main(String[] args) throws Exception {
 
+        if (args.length != 1) {
+            System.err.println("Usage: java UDPServer <port>");
+            System.exit(1);
+        }
+
         DataProcessing data = new DataProcessing();
         serverPort = Integer.parseInt(args[0]);
         UDPServer udpServer = new UDPServer(serverPort, data);

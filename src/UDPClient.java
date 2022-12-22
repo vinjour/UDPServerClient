@@ -63,6 +63,11 @@ public class UDPClient {
 
     public static void main(String args[]) throws Exception {
 
+        if (args.length != 2) {
+            System.err.println("Usage: java UDPClient <IPaddress> <port>");
+            System.exit(1);
+        }
+
         DataProcessing data = new DataProcessing();
         serverAddress = InetAddress.getByName(args[0]);
         UDPClient.serverPort = Integer.parseInt(args[1]);
