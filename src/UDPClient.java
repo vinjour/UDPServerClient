@@ -59,7 +59,7 @@ public class UDPClient {
         System.out.println("From server at: " + serverAddress + ":" + serverPort);
     }
 
-    public static void main(String args[]) throws Exception {
+    public static void main(String[] args) throws Exception {
 
         if (args.length != 2) {
             System.err.println("Usage: java UDPClient <IPaddress> <port>");

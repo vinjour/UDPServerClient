@@ -20,7 +20,7 @@ public class DataProcessing {
         return echoSentence;
     }
 
-    public static void main(String args[]) {
+    public static void main(String[] args) {
 
         DataProcessing dataprocessing = new DataProcessing();
         dataprocessing.process(dataprocessing.receivePacket);

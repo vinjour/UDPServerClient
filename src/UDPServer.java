@@ -39,12 +39,11 @@ public class UDPServer {
         serverSocket.close();
     }
 
-    private DatagramPacket receiveMessage() throws IOException {
+    private void receiveMessage() throws IOException {
 
         System.out.println("Waiting for datagram packet");
 
         serverSocket.receive(receivePacket);
-        return receivePacket;
     }
 
 
@@ -56,7 +55,7 @@ public class UDPServer {
         serverSocket.send(sendPacket);
     }
 
-    public static void main(String args[]) throws Exception {
+    public static void main(String[] args) throws Exception {
 
         if (args.length != 1) {
             System.err.println("Usage: java UDPServer <port>");
