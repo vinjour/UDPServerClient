@@ -9,7 +9,7 @@ public class UDPClient {
     static InetAddress serverAddress;
     DatagramSocket clientSocket;
     DatagramPacket receivePacket;
-    BufferedReader inFromUser;
+    BufferedReader readMsgToSend;
     DataProcessing data;
     byte[] sendData;
     byte[] receiveData;
@@ -22,7 +22,7 @@ public class UDPClient {
             System.exit(1);
         }
 
-        inFromUser = new BufferedReader(new InputStreamReader(System.in));
+        readMsgToSend = new BufferedReader(new InputStreamReader(System.in));
         sendData = new byte[BUFFER_SIZE];
         receiveData = new byte[BUFFER_SIZE];
         receivePacket =  new DatagramPacket(receiveData, receiveData.length);
@@ -31,14 +31,12 @@ public class UDPClient {
 
     public void run(InetAddress serverAddress) throws IOException {
 
-        boolean keepListening = true;
+        boolean connected = true;
 
-        while(keepListening) {
+        while(connected) {
 
             sendMessage(serverAddress);
-
             clientSocket.setSoTimeout(TIMER_SIZE);
-
             receiveMessage(serverAddress, receivePacket);
             data.process(receivePacket);
         }
@@ -48,7 +46,7 @@ public class UDPClient {
     private void sendMessage(InetAddress serverAddress) throws IOException {
         System.out.print("Enter Message: ");
 
-        String sentence = inFromUser.readLine();
+        String sentence = readMsgToSend.readLine();
         sendData = sentence.getBytes();
         DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length, serverAddress, serverPort);
         clientSocket.send(sendPacket);

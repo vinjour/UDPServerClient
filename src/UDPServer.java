@@ -28,9 +28,9 @@ public class UDPServer {
     }
 
     public void launch() throws IOException {
-        boolean keepListening = true;
+        boolean listening = true;
 
-        while (keepListening) {
+        while (listening) {
 
             receiveMessage();
             String sentence = data.process(receivePacket);
@@ -56,7 +56,7 @@ public class UDPServer {
         serverSocket.send(sendPacket);
     }
 
-    public static void main(String[] args) throws Exception {
+    public static void main(String args[]) throws Exception {
 
         if (args.length != 1) {
             System.err.println("Usage: java UDPServer <port>");
@@ -65,6 +65,7 @@ public class UDPServer {
 
         DataProcessing data = new DataProcessing();
         serverPort = Integer.parseInt(args[0]);
+
         UDPServer udpServer = new UDPServer(serverPort, data);
         udpServer.launch();
     }
