@@ -13,7 +13,6 @@ public class UDPServer {
     DatagramPacket receivePacket;
     DataProcessing data;
     byte[] receiveData;
-    byte[] sendData;
 
     public UDPServer(int serverPort, DataProcessing datap) {
         try {

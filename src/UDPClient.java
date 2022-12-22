@@ -4,6 +4,7 @@ import java.net.*;
 
 public class UDPClient {
     static int BUFFER_SIZE = 1024;
+    static int TIMER_SIZE = 10000;  // Milliseconds
     static int serverPort;
     static InetAddress serverAddress;
     DatagramSocket clientSocket;
@@ -21,7 +22,6 @@ public class UDPClient {
             System.exit(1);
         }
 
-        //On récupère la ligne courante
         inFromUser = new BufferedReader(new InputStreamReader(System.in));
         sendData = new byte[BUFFER_SIZE];
         receiveData = new byte[BUFFER_SIZE];
@@ -37,8 +37,7 @@ public class UDPClient {
 
             sendMessage(serverAddress);
 
-            // délai maximal d'attente 10000 ms
-            clientSocket.setSoTimeout(10000);
+            clientSocket.setSoTimeout(TIMER_SIZE);
 
             receiveMessage(serverAddress, receivePacket);
             data.process(receivePacket);
@@ -52,16 +51,13 @@ public class UDPClient {
         String sentence = inFromUser.readLine();
         sendData = sentence.getBytes();
         DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length, serverAddress, serverPort);
-
         clientSocket.send(sendPacket);
     }
 
     private void receiveMessage(InetAddress serverAddress, DatagramPacket receivePacket) throws IOException {
 
         System.out.println ("Waiting for return packet");
-
         clientSocket.receive(receivePacket);
-
         System.out.println("From server at: " + serverAddress + ":" + serverPort);
     }
 
